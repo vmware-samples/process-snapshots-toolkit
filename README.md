@@ -1,4 +1,4 @@
-# process-snapshot-toolkit
+# Process Snapshot Toolkit
 The toolkit to work with Process Snapshots generated during dynamic analysis by VMware Anti-Malware Sandbox.
 
 ## Overview
