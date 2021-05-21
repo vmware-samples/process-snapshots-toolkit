@@ -10,7 +10,6 @@ The snapshot file contains at least one (up to ten) snapshot(s) of the untrusted
 It is designed to provide a in-depth visibility into malicious code, including code which is packed/hidden in the original executable and only gets unpacked during execution.
 
 For more details how to download Process Snapshot, please refer to the official [documentation](https://analysis.lastline.com/analysis/api-docs/html/analysis_results/format_ll_int_win.html#windows-analysis-process-dumps-pe-snapshots)
-:
 
 #### Installation
 To install our package, please run 
