@@ -41,7 +41,10 @@ CORRUPT_SNAPSHOT_MEMORY_BLOCK_1 = {
     "snapshot_id": 0,
     "type": "LLAMA_SNAPSHOT_DUMP_INFO",
     "memory_blocks": [
-        {"object_description": "vm_memory_block", "virtual_address": "0x74b20000",}
+        {
+            "object_description": "vm_memory_block",
+            "virtual_address": "0x74b20000",
+        }
     ],
 }
 
@@ -97,7 +100,11 @@ CORRUPT_SNAPSHOT_LOADED_LIB_1 = {
     "version": 3,
     "snapshot_id": 0,
     "type": "LLAMA_SNAPSHOT_DUMP_INFO",
-    "loaded_libraries": [{"virtual_address": "0x699b0000",}],
+    "loaded_libraries": [
+        {
+            "virtual_address": "0x699b0000",
+        }
+    ],
 }
 CORRUPT_SNAPSHOT_LOADED_LIB_2 = {
     "analysis_reason": "analyze_module_execution",
@@ -105,7 +112,11 @@ CORRUPT_SNAPSHOT_LOADED_LIB_2 = {
     "version": 3,
     "snapshot_id": 0,
     "type": "LLAMA_SNAPSHOT_DUMP_INFO",
-    "loaded_libraries": [{"object_description": "oleacc.dll",}],
+    "loaded_libraries": [
+        {
+            "object_description": "oleacc.dll",
+        }
+    ],
 }
 
 CORRECT_SNAPSHOT_V3 = {
@@ -191,7 +202,7 @@ CORRECT_SNAPSHOT_V3 = {
 
 
 class TestSnapshotManager(unittest.TestCase):
-    """ Testcases for snapshot.*. """
+    """Testcases for snapshot.*."""
 
     DATA_DIR = "process_snapshot_toolkit_test/test_data/snapshot"
     SNAPSHOT_32BIT_NAME = "process_snapshots_1"
@@ -301,7 +312,7 @@ class TestSnapshotManager(unittest.TestCase):
         self.assertEqual(len(snapshot.memory_blocks), num_memory_blocks)
 
     def test_snapshot_factory_on_packed_snapshot(self):
-        """ Test the ProcessSnapshotMgrFactory class using 32 bit snapshot """
+        """Test the ProcessSnapshotMgrFactory class using 32 bit snapshot"""
         snapshot_path = os.path.join(self.DATA_DIR, self.SNAPSHOT_PACKED_NAME)
 
         version = m_factory.ProcessSnapshotMgrFactory.get_version(snapshot_path)
@@ -356,7 +367,7 @@ class TestSnapshotManager(unittest.TestCase):
         )
 
     def test_snapshot_factory_on_32bit_snapshot(self):
-        """ Test the ProcessSnapshotMgrFactory class using 32 bit snapshot """
+        """Test the ProcessSnapshotMgrFactory class using 32 bit snapshot"""
         snapshot_path = os.path.join(self.DATA_DIR, self.SNAPSHOT_32BIT_NAME)
 
         version = m_factory.ProcessSnapshotMgrFactory.get_version(snapshot_path)
@@ -454,7 +465,7 @@ class TestSnapshotManager(unittest.TestCase):
         )
 
     def test_snapshot_factory_on_64bit_snapshot(self):
-        """ Test the ProcessSnapshotMgrFactory class using 64 bit snapshot """
+        """Test the ProcessSnapshotMgrFactory class using 64 bit snapshot"""
         snapshot_path = os.path.join(self.DATA_DIR, self.SNAPSHOT_64BIT_NAME)
 
         version = m_factory.ProcessSnapshotMgrFactory.get_version(snapshot_path)
@@ -553,7 +564,7 @@ class TestSnapshotManager(unittest.TestCase):
         )
 
     def test_snapshot_factory_on_truncated_snapshot(self):
-        """ Test the ProcessSnapshotMgrFactory class using truncated snapshot """
+        """Test the ProcessSnapshotMgrFactory class using truncated snapshot"""
         snapshot_path = os.path.join(self.DATA_DIR, self.TRUNC_SNAPSHOT_NAME)
         version = m_factory.ProcessSnapshotMgrFactory.get_version(snapshot_path)
         self.assertEqual(version, 3)
@@ -562,7 +573,7 @@ class TestSnapshotManager(unittest.TestCase):
             m_factory.ProcessSnapshotMgrFactory.from_file(snapshot_path)
 
     def test_snapshot_factory_on_wrong_version(self):
-        """ Test the ProcessSnapshotMgrFactory class using snapshot with wrong version"""
+        """Test the ProcessSnapshotMgrFactory class using snapshot with wrong version"""
         snapshot_path = os.path.join(self.DATA_DIR, self.WRONG_VERSION_SNAPSHOT_NAME)
 
         version = m_factory.ProcessSnapshotMgrFactory.get_version(snapshot_path)
@@ -572,7 +583,7 @@ class TestSnapshotManager(unittest.TestCase):
             m_factory.ProcessSnapshotMgrFactory.from_file(snapshot_path)
 
     def test_snapshot_factory_on_incorrect_path(self):
-        """ Test the ProcessSnapshotMgrFactory class using snapshot with wrong version"""
+        """Test the ProcessSnapshotMgrFactory class using snapshot with wrong version"""
         with self.assertRaises(m_snapshot.InvalidProcessSnapshot):
             m_factory.ProcessSnapshotMgrFactory.get_version(
                 self.NOT_EXIST_SNAPSHOT_PATH
@@ -581,7 +592,7 @@ class TestSnapshotManager(unittest.TestCase):
             m_factory.ProcessSnapshotMgrFactory.from_file(self.NOT_EXIST_SNAPSHOT_PATH)
 
     def test_utils_va_from_string(self):
-        """ Test the m_snapshot.utils.va_from_string method. """
+        """Test the m_snapshot.utils.va_from_string method."""
 
         self.assertEqual(m_utils.va_from_string("fdsafdsf"), 0)
         self.assertEqual(m_utils.va_from_string("000"), 0)

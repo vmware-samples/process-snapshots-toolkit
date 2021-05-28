@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class Error(Exception):
-    """ Base-class for all exceptions in this module. """
+    """Base-class for all exceptions in this module."""
 
 
 class ProcessSnapshotV3(snapshot.ProcessSnapshot):

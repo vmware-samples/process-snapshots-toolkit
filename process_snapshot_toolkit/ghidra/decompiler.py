@@ -28,19 +28,19 @@ logger = logging.getLogger(__name__)
 
 
 class Error(Exception):
-    """ Base-class for all exceptions in this module. """
+    """Base-class for all exceptions in this module."""
 
 
 class InvalidGhidraSettings(Error):
-    """ Invalid parameters for Ghidra Decompiler. """
+    """Invalid parameters for Ghidra Decompiler."""
 
 
 class InvalidDecompilationTarget(Error):
-    """ Invalid target to decompile. """
+    """Invalid target to decompile."""
 
 
 class GhidraDecompiler(object):
-    """ Interface to Ghidra to decompile exe files and Lastline process snapshots. """
+    """Interface to Ghidra to decompile exe files and Lastline process snapshots."""
 
     def __init__(self, ghidra_dir, postprocessing_script_path, verbose=False):
         """

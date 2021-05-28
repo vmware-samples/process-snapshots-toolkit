@@ -23,7 +23,7 @@ import unittest
 
 
 class TestCase(unittest.TestCase):
-    """ Base class for unit tests for process-snapshot-toolkit. """
+    """Base class for unit tests for process-snapshot-toolkit."""
 
     @classmethod
     def setUpClass(cls):

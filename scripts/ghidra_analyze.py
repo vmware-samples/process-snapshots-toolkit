@@ -31,15 +31,15 @@ logger = logging.getLogger(__name__)
 
 
 class Error(Exception):
-    """ Base-class for all exceptions in this module. """
+    """Base-class for all exceptions in this module."""
 
 
 class IncorrectDecompileTarget(Error):
-    """ Incorrect target for decompilation provided. """
+    """Incorrect target for decompilation provided."""
 
 
 class MethodNotImplemented(Error):
-    """ Method is not implemented yet. """
+    """Method is not implemented yet."""
 
 
 def process_target_dirs(decompiler, target_dirs):
@@ -168,5 +168,5 @@ Analyze executable file or Lastline Process Snapshot using Ghidra decompiler.
 
 
 if __name__ == "__main__":
-    """ Main function of the script. """
+    """Main function of the script."""
     do_main()

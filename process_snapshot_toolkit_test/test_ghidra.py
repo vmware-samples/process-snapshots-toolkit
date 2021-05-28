@@ -36,7 +36,7 @@ class MockArguments(object):
 
 
 class TestUtils(object):
-    """ Utility collection for test_ghidra. """
+    """Utility collection for test_ghidra."""
 
     @staticmethod
     def get_mock_config(ghidra_dir="", decompiler_script_path=""):
@@ -68,7 +68,7 @@ class TestUtils(object):
 
 
 class TestGhidraDecompiler(unittest.TestCase):
-    """ Testcases for ghidra.decompiler. """
+    """Testcases for ghidra.decompiler."""
 
     GHIDRA_DIR = "ghidra_dir/path"
     GHIDRA_SCRIPT = "decompiler/postprocessing_script_path.py"

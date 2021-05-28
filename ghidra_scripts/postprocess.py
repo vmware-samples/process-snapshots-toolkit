@@ -30,7 +30,9 @@ logger = logging.getLogger(__name__)
 # that is a super-hack to make Ghidra see our modules from post-processing script
 sys.path.append("/usr/local/lib/python2.7/dist-packages")
 sys.path.append("/usr/lib/python2.7/dist-packages")
-sys.path.append("{}/.local/lib/python2.7/site-packages/".format(os.path.expanduser('~')))
+sys.path.append(
+    "{}/.local/lib/python2.7/site-packages/".format(os.path.expanduser("~"))
+)
 
 from process_snapshot_toolkit.snapshot import factory
 from process_snapshot_toolkit.snapshot import utils

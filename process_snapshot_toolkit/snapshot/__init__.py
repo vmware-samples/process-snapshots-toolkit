@@ -13,15 +13,15 @@ logger = logging.getLogger(__name__)
 
 
 class Error(Exception):
-    """ Base-class for all exceptions in this module. """
+    """Base-class for all exceptions in this module."""
 
 
 class InvalidProcessSnapshot(Error):
-    """ Invalid Lastline Process Snapshot file. """
+    """Invalid Lastline Process Snapshot file."""
 
 
 class UnsupportedVersionProcessSnapshot(Error):
-    """ Unsupported version of Lastline Process Snapshot file. """
+    """Unsupported version of Lastline Process Snapshot file."""
 
 
 LibraryExport = namedtuple("LibraryExport", ["name", "virtual_address"])
@@ -58,7 +58,7 @@ PeSectionBase = namedtuple(
 
 
 class PeSection(PeSectionBase):
-    """ Represents PE section in snapshot. """
+    """Represents PE section in snapshot."""
 
     # pe section cheracteristics
     IMAGE_SCN_LNK_NRELOC_OVFL = 0x01000000  # Section contains extended relocations.
@@ -133,7 +133,7 @@ MemoryBlockBase = namedtuple(
 
 
 class MemoryBlock(MemoryBlockBase):
-    """ Represents Virtual Memory block in snapshot. """
+    """Represents Virtual Memory block in snapshot."""
 
     # memory block access
     PAGE_NOACCESS = 0x01  # winnt
@@ -208,7 +208,7 @@ class MemoryBlock(MemoryBlockBase):
 
 
 class ProcessSnapshot(object):
-    """ Lastline Process Snapshot. """
+    """Lastline Process Snapshot."""
 
     def __init__(
         self,

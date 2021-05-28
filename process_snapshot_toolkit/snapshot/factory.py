@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class Error(Exception):
-    """ Base-class for all exceptions in this module. """
+    """Base-class for all exceptions in this module."""
 
 
 class ProcessSnapshotMgrFactory(object):
-    """ Lastline Process Snapshot Manager Factory. """
+    """Lastline Process Snapshot Manager Factory."""
 
     SUPPORTED_SNAPSHOT_VERSIONS = {3: v3.ProcessSnapshotMgrV3}
 
