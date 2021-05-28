@@ -21,6 +21,8 @@ Follow the [GitHub process](https://help.github.com/articles/fork-a-repo)
 ### Code Style
 Python -  PEP8 standards: https://pypi.python.org/pypi/pep8
 
+Before commiting the code, please run pylint.sh and black.sh to check for errors/warning and correct code formatting.
+
 ### Formatting Commit Messages
 
 We follow the conventions on [How to Write a Git Commit Message](http://chris.beams.io/posts/git-commit/).
