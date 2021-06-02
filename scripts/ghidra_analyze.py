@@ -1,6 +1,7 @@
 #!/usr/bin/python
 """
-Copyright (c) 2020-2021 VMware, Inc. All Rights Reserved.
+Copyright 2020-2021 VMware, Inc.
+SPDX-License-Identifier: BSD-2-Clause
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
