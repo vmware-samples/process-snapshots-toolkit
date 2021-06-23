@@ -18,8 +18,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 """
 This module contains the testcases for the process_snapshot_toolkit.ghidra module.
 """
-
-import ConfigParser
+try:
+    import ConfigParser as configparser
+except ImportError:
+    import configparser
 import mock
 import unittest
 from process_snapshot_toolkit.ghidra import decompiler as m_decompiler
@@ -41,7 +43,7 @@ class TestUtils(object):
 
     @staticmethod
     def get_mock_config(ghidra_dir="", decompiler_script_path=""):
-        config = ConfigParser.RawConfigParser()
+        config = configparser.RawConfigParser()
         ghidra_section_name = "ghidra"
         config.add_section(ghidra_section_name)
         config.set(ghidra_section_name, "ghidra_dir", ghidra_dir)
@@ -225,3 +227,7 @@ class TestGhidraDecompiler(unittest.TestCase):
         with mock.patch("{}.os.path.isfile".format(MODULE), clear=True) as mock_isfile:
             with mock.patch("{}.os.mkdir".format(MODULE), clear=True) as mock_mkdir:
                 decompiler.decompile_exe_file(EXE_PATH, OUTPUT_DIR)
+
+
+if __name__ == "__main__":
+    unittest.main()
