@@ -31,6 +31,9 @@ class ProcessSnapshotV3(snapshot.ProcessSnapshot):
     It provides an access to memory layout extracted during dynamic analysis.
     """
 
+    HASHES_32_FILE_NAME = "hashes_x86.json"
+    HASHES_64_FILE_NAME = "hashes_x86_64.json"
+
     @classmethod
     def from_dict(cls, snapshot_dict, storage_dir):
         """
@@ -59,6 +62,11 @@ class ProcessSnapshotV3(snapshot.ProcessSnapshot):
                 memory_blocks = ProcessSnapshotV3._parse_memory_blocks(
                     snapshot_dict["memory_blocks"], storage_dir
                 )
+
+            hashes = ProcessSnapshotV3._parse_hashes(
+                snapshot_dict["snapshot_id"], snapshot_dict["bitsize"], storage_dir
+            )
+
             return cls(
                 storage_dir,
                 snapshot_dict["version"],
@@ -69,11 +77,28 @@ class ProcessSnapshotV3(snapshot.ProcessSnapshot):
                 loaded_lib,
                 pe_images,
                 memory_blocks,
+                hashes,
             )
 
         except (TypeError, KeyError) as err:
             logger.error("Incorrectly formatted snapshot. Error: %s", err)
             return None
+
+    @staticmethod
+    def _parse_hashes(snapshot_id, bitsize, storage_dir):
+        if bitsize == 32:
+            f_name = ProcessSnapshotV3.HASHES_32_FILE_NAME
+        elif bitsize == 64:
+            f_name = ProcessSnapshotV3.HASHES_64_FILE_NAME
+        else:
+            return {}
+        with open(os.path.join(storage_dir, f_name), "r") as f:
+            data = json.load(f)
+        return {
+            func_hash: hash_blocks
+            for func_hash, hash_blocks in data.get("hashes", {}).items()
+            if snapshot_id in hash_blocks["snaps"]
+        }
 
     @staticmethod
     def _parse_pe_images(pe_images_node, storage_dir):
@@ -222,7 +247,7 @@ class ProcessSnapshotV3(snapshot.ProcessSnapshot):
                 lib_exports = dict()
                 lib_max_rva = 0x1000
                 if "exports" in lib:
-                    for export in lib["exports"].itervalues():
+                    for export in lib["exports"].values():
                         export_va = lib_va + export["rva"]
                         lib_exports[export_va] = snapshot.LibraryExport(
                             str(export["name"]), export_va

@@ -46,13 +46,13 @@ PeImage = namedtuple(
 PeSectionBase = namedtuple(
     "PeSectionBase",
     [
-        "name",
-        "virtual_address",
-        "entry_points",
-        "size",
-        "characteristics",
-        "object_uuid",
-        "data",
+        "name",  # :param str name: PE section name
+        "virtual_address",  # :param int virtual_address: section virtual address
+        "entry_points",  # :param list entry_points: list of entry points to the section
+        "size",  # :param int size: PE section size
+        "characteristics",  # :param int characteristics: PE section characteristics
+        "object_uuid",  # :param str object_uuid: unique id of the PE section
+        "data",  # :param list data: PE section content
     ],
 )
 
@@ -70,64 +70,29 @@ class PeSection(PeSectionBase):
     IMAGE_SCN_MEM_READ = 0x40000000  # Section is readable.
     IMAGE_SCN_MEM_WRITE = 0x80000000  # Section is writeable.
 
-    def __init__(
-        self,
-        name,
-        virtual_address,
-        entry_points,
-        size,
-        characteristics,
-        object_uuid,
-        data,
-    ):
-        """
-        PeSection object represents a PE Section in process address space.
-
-        :param str name: PE section name
-        :param int virtual_address: section virtual address
-        :param list entry_points: list of entry points to the section detected during dynamic analysis
-        :param int size: PE section size
-        :param int characteristics: PE section characteristics
-        :param str object_uuid: unique id of the PE section
-        :param list data: PE section content
-        """
-        super(PeSectionBase, self).__init__(
-            name,
-            virtual_address,
-            entry_points,
-            size,
-            characteristics,
-            object_uuid,
-            data,
-        )
-
-        self._is_read = characteristics & self.IMAGE_SCN_MEM_READ != 0
-        self._is_write = characteristics & self.IMAGE_SCN_MEM_WRITE != 0
-        self._is_execute = characteristics & self.IMAGE_SCN_MEM_EXECUTE != 0
-
     @property
     def is_read(self):
-        return self._is_read
+        return self.characteristics & self.IMAGE_SCN_MEM_READ != 0
 
     @property
     def is_write(self):
-        return self._is_write
+        return self.characteristics & self.IMAGE_SCN_MEM_WRITE != 0
 
     @property
     def is_execute(self):
-        return self._is_execute
+        return self.characteristics & self.IMAGE_SCN_MEM_EXECUTE != 0
 
 
 MemoryBlockBase = namedtuple(
     "MemoryBlockBase",
     [
-        "name",
-        "virtual_address",
-        "entry_points",
-        "size",
-        "access",
-        "object_uuid",
-        "data",
+        "name",  # :param str name: name of the memory block as assigned by sandbox
+        "virtual_address",  # :param int virtual_address: virtual address of the memory block start address
+        "entry_points",  # :param list entry_points: a list of entry points detected during dynamic analysis
+        "size",  # :param int size: a size of memory block
+        "access",  # :param int access: page protection for the memory block
+        "object_uuid",  # :param str object_uuid: unique id of the memory block
+        "data",  # :param list data: memory block content
     ],
 )
 
@@ -148,63 +113,33 @@ class MemoryBlock(MemoryBlockBase):
     PAGE_NOCACHE = 0x200  # winnt
     PAGE_WRITECOMBINE = 0x400  # winnt
 
-    def __init__(
-        self, name, virtual_address, entry_points, size, access, object_uuid, data
-    ):
-        """
-        MemoryBlock object represents a memory region in process address space.
-
-        :param str name: name of the memory block as assigned by sandbox
-        :param int virtual_address: virtual address of the memory block start address
-        :param list entry_points: a list of entry points detected during dynamic analysis
-        :param int size: a size of memory block
-        :param int access: page protection for the memory block
-        :param str object_uuid: unique id of the memory block
-        :param list data: memory block content
-        """
-        super(MemoryBlockBase, self).__init__(
-            name, virtual_address, entry_points, size, access, object_uuid, data
-        )
-
-        self._is_read = False
-        if (
-            (access & self.PAGE_READONLY)
-            or (access & self.PAGE_READWRITE)
-            or (access & self.PAGE_EXECUTE_READ)
-            or (access & self.PAGE_EXECUTE_READWRITE)
-        ):
-            self._is_read = True
-
-        self._is_write = False
-        if (
-            (access & self.PAGE_READWRITE)
-            or (access & self.PAGE_WRITECOPY)
-            or (access & self.PAGE_EXECUTE_READWRITE)
-            or (access & self.PAGE_EXECUTE_WRITECOPY)
-            or (access & self.PAGE_WRITECOMBINE)
-        ):
-            self._is_write = True
-
-        self._is_execute = False
-        if (
-            (access & self.PAGE_EXECUTE)
-            or (access & self.PAGE_EXECUTE_READ)
-            or (access & self.PAGE_EXECUTE_READWRITE)
-            or (access & self.PAGE_EXECUTE_WRITECOPY)
-        ):
-            self._is_execute = True
-
     @property
     def is_read(self):
-        return self._is_read
+        return bool(
+            (self.access & self.PAGE_READONLY)
+            or (self.access & self.PAGE_READWRITE)
+            or (self.access & self.PAGE_EXECUTE_READ)
+            or (self.access & self.PAGE_EXECUTE_READWRITE)
+        )
 
     @property
     def is_write(self):
-        return self._is_write
+        return bool(
+            (self.access & self.PAGE_READWRITE)
+            or (self.access & self.PAGE_WRITECOPY)
+            or (self.access & self.PAGE_EXECUTE_READWRITE)
+            or (self.access & self.PAGE_EXECUTE_WRITECOPY)
+            or (self.access & self.PAGE_WRITECOMBINE)
+        )
 
     @property
     def is_execute(self):
-        return self._is_execute
+        return bool(
+            (self.access & self.PAGE_EXECUTE)
+            or (self.access & self.PAGE_EXECUTE_READ)
+            or (self.access & self.PAGE_EXECUTE_READWRITE)
+            or (self.access & self.PAGE_EXECUTE_WRITECOPY)
+        )
 
 
 class ProcessSnapshot(object):
@@ -221,6 +156,7 @@ class ProcessSnapshot(object):
         loaded_libs,
         pe_images,
         memory_blocks,
+        hashes,
     ):
         """
         Lastline Process Snapshot provides an access to memory
@@ -235,6 +171,7 @@ class ProcessSnapshot(object):
         :param loaded_lib:
         :param pe_images:
         :param memory_blocks:
+        :param dict[str, any] hashes: code hashes
         """
         self._storage_dir = storage_dir
         self._version = version
@@ -245,6 +182,7 @@ class ProcessSnapshot(object):
         self._loaded_libs = loaded_libs
         self._pe_images = pe_images
         self._memory_blocks = memory_blocks
+        self._hashes = hashes
 
     @property
     def version(self):
@@ -277,6 +215,10 @@ class ProcessSnapshot(object):
     @property
     def memory_blocks(self):
         return self._memory_blocks
+
+    @property
+    def hashes(self):
+        return self._hashes
 
     def get_lib(self, va):
         """
