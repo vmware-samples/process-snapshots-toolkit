@@ -22,7 +22,7 @@ import setuptools
 
 setuptools.setup(
     name="process-snapshot-toolkit",
-    version="0.1",
+    version="0.1.0",
     description="VMware Toolkit to work with process snapshot.",
     url="https://github.com/Lastline-Inc/process-snapshot-toolkit",
     author="AMG at VMware, Inc.",
