@@ -141,8 +141,10 @@ class GhidraDecompiler(object):
             stdout = stderr = subprocess.PIPE
             if self._verbose:
                 stdout = stderr = None
-            process = subprocess.Popen(ghidra_cmd, stdout=stdout, stderr=stderr)
-            process.communicate()
+            # process = subprocess.Popen(ghidra_cmd, stdout=stdout, stderr=stderr)
+            # process.communicate()
+            subprocess.check_call(ghidra_cmd)
+            import pdb; pdb.set_trace()
 
         finally:
             shutil.rmtree(ghidra_work_dir)
