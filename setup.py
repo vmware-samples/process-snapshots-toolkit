@@ -36,6 +36,16 @@ setuptools.setup(
     scripts=[
         "scripts/ghidra_analyze.py",
     ],
-    test_suite="nose.collector"
+    test_suite="nose.collector",
+    install_requires=[
+        "six",
+    ],
+    tests_require=[
+        "mock",
+        "nose",
+        "nosexcover",
+        "nose-timer",
+        "tox",
+    ],
 )
 
