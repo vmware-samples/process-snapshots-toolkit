@@ -92,8 +92,12 @@ class ProcessSnapshotV3(snapshot.ProcessSnapshot):
             f_name = ProcessSnapshotV3.HASHES_64_FILE_NAME
         else:
             return {}
-        with open(os.path.join(storage_dir, f_name), "r") as f:
-            data = json.load(f)
+        try:
+            with open(os.path.join(storage_dir, f_name), "r") as f:
+                data = json.load(f)
+        except IOError:
+            logger.warning("Hashes file %s not present in snapshot %s", f_name, snapshot_id)
+            return {}
         return {
             func_hash: hash_blocks
             for func_hash, hash_blocks in data.get("hashes", {}).items()
