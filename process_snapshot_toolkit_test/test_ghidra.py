@@ -32,9 +32,8 @@ MODULE = "process_snapshot_toolkit.ghidra.decompiler"
 class MockArguments(object):
     """Mock arguments class"""
 
-    def __init__(self, ghidra_dir, decompiler_script_path, verbose):
+    def __init__(self, ghidra_dir, verbose):
         self.ghidra_dir = ghidra_dir
-        self.decompiler_script_path = decompiler_script_path
         self.verbose = verbose
 
 
@@ -42,31 +41,26 @@ class TestUtils(object):
     """Utility collection for test_ghidra."""
 
     @staticmethod
-    def get_mock_config(ghidra_dir="", decompiler_script_path=""):
+    def get_mock_config(ghidra_dir=""):
         config = configparser.RawConfigParser()
         ghidra_section_name = "ghidra"
         config.add_section(ghidra_section_name)
         config.set(ghidra_section_name, "ghidra_dir", ghidra_dir)
-        config.set(
-            ghidra_section_name, "decompiler_script_path", decompiler_script_path
-        )
         return config
 
     @staticmethod
-    def get_mock_args(ghidra_dir="", decompiler_script_path="", verbose=False):
-        return MockArguments(ghidra_dir, decompiler_script_path, verbose)
+    def get_mock_args(ghidra_dir="", verbose=False):
+        return MockArguments(ghidra_dir, verbose)
 
     @staticmethod
-    def get_mock_decompiler(ghidra_dir="", decompiler_script_path="", verbose=False):
+    def get_mock_decompiler(ghidra_dir="", verbose=False):
         with mock.patch("{}.os.path.isfile".format(MODULE), clear=True) as mock_isfile:
             with mock.patch(
                 "{}.os.path.isdir".format(MODULE), clear=True
             ) as mock_isdir:
                 return m_decompiler.GhidraDecompiler.from_args_and_conf(
-                    TestUtils.get_mock_args(
-                        ghidra_dir, decompiler_script_path, verbose
-                    ),
-                    TestUtils.get_mock_config(ghidra_dir, decompiler_script_path),
+                    TestUtils.get_mock_args(ghidra_dir, verbose),
+                    TestUtils.get_mock_config(ghidra_dir),
                 )
 
 
@@ -74,24 +68,23 @@ class TestGhidraDecompiler(unittest.TestCase):
     """Testcases for ghidra.decompiler."""
 
     GHIDRA_DIR = "ghidra_dir/path"
-    GHIDRA_SCRIPT = "decompiler/postprocessing_script_path.py"
 
     def test_ghidra_from__incorrect_args_and_conf(self):
         with self.assertRaises(m_decompiler.InvalidGhidraSettings):
             m_decompiler.GhidraDecompiler.from_args_and_conf(
-                TestUtils.get_mock_args(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
-                TestUtils.get_mock_config(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
+                TestUtils.get_mock_args(self.GHIDRA_DIR),
+                TestUtils.get_mock_config(self.GHIDRA_DIR),
             )
 
         with self.assertRaises(m_decompiler.InvalidGhidraSettings):
             m_decompiler.GhidraDecompiler.from_args_and_conf(
                 TestUtils.get_mock_args(),
-                TestUtils.get_mock_config(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
+                TestUtils.get_mock_config(self.GHIDRA_DIR),
             )
 
         with self.assertRaises(m_decompiler.InvalidGhidraSettings):
             m_decompiler.GhidraDecompiler.from_args_and_conf(
-                TestUtils.get_mock_args(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
+                TestUtils.get_mock_args(self.GHIDRA_DIR),
                 TestUtils.get_mock_config(),
             )
 
@@ -103,8 +96,8 @@ class TestGhidraDecompiler(unittest.TestCase):
 
         with self.assertRaises(m_decompiler.InvalidGhidraSettings):
             m_decompiler.GhidraDecompiler.from_args_and_conf(
-                TestUtils.get_mock_args("", self.GHIDRA_SCRIPT),
-                TestUtils.get_mock_config("", self.GHIDRA_SCRIPT),
+                TestUtils.get_mock_args(""),
+                TestUtils.get_mock_config(""),
             )
 
         with self.assertRaises(m_decompiler.InvalidGhidraSettings):
@@ -114,29 +107,20 @@ class TestGhidraDecompiler(unittest.TestCase):
 
     @mock.patch("{}.os.path.isfile".format(MODULE), clear=True)
     @mock.patch("{}.os.path.isdir".format(MODULE), clear=True)
-    def test_ghidra_from__no_script_found(self, mock_isfile, mock_isdir):
-        with self.assertRaises(m_decompiler.InvalidGhidraSettings):
-            m_decompiler.GhidraDecompiler.from_args_and_conf(
-                TestUtils.get_mock_args(self.GHIDRA_DIR),
-                TestUtils.get_mock_config(self.GHIDRA_DIR),
-            )
-
-    @mock.patch("{}.os.path.isfile".format(MODULE), clear=True)
-    @mock.patch("{}.os.path.isdir".format(MODULE), clear=True)
     def test_ghidra_from__correct_args(self, mock_isfile, mock_isdir):
 
         m_decompiler.GhidraDecompiler.from_args_and_conf(
-            TestUtils.get_mock_args(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
-            TestUtils.get_mock_config(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
+            TestUtils.get_mock_args(self.GHIDRA_DIR),
+            TestUtils.get_mock_config(self.GHIDRA_DIR),
         )
 
         m_decompiler.GhidraDecompiler.from_args_and_conf(
             TestUtils.get_mock_args(),
-            TestUtils.get_mock_config(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
+            TestUtils.get_mock_config(self.GHIDRA_DIR),
         )
 
         m_decompiler.GhidraDecompiler.from_args_and_conf(
-            TestUtils.get_mock_args(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
+            TestUtils.get_mock_args(self.GHIDRA_DIR),
             TestUtils.get_mock_config(),
         )
 
@@ -159,8 +143,8 @@ class TestGhidraDecompiler(unittest.TestCase):
         SNAPSHOT_PATH = "process_snapshot"
         OUTPUT_DIR = "output/directory/"
         decompiler = m_decompiler.GhidraDecompiler.from_args_and_conf(
-            TestUtils.get_mock_args(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
-            TestUtils.get_mock_config(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
+            TestUtils.get_mock_args(self.GHIDRA_DIR),
+            TestUtils.get_mock_config(self.GHIDRA_DIR),
         )
         decompiler.decompile_snapshot_file(EXE_PATH, SNAPSHOT_PATH, OUTPUT_DIR)
 
@@ -182,8 +166,8 @@ class TestGhidraDecompiler(unittest.TestCase):
         EXE_PATH = "exe_file"
         OUTPUT_DIR = "output/directory/"
         decompiler = m_decompiler.GhidraDecompiler.from_args_and_conf(
-            TestUtils.get_mock_args(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
-            TestUtils.get_mock_config(self.GHIDRA_DIR, self.GHIDRA_SCRIPT),
+            TestUtils.get_mock_args(self.GHIDRA_DIR),
+            TestUtils.get_mock_config(self.GHIDRA_DIR),
         )
         decompiler.decompile_exe_file(EXE_PATH, OUTPUT_DIR)
 
@@ -198,9 +182,7 @@ class TestGhidraDecompiler(unittest.TestCase):
         SNAPSHOT_PATH = "process_snapshot"
         OUTPUT_DIR = "output/directory/"
 
-        decompiler = TestUtils.get_mock_decompiler(
-            self.GHIDRA_DIR, self.GHIDRA_SCRIPT, True
-        )
+        decompiler = TestUtils.get_mock_decompiler(self.GHIDRA_DIR, True)
         with self.assertRaises(m_decompiler.InvalidDecompilationTarget):
             decompiler.decompile_snapshot_file(EXE_PATH, SNAPSHOT_PATH, OUTPUT_DIR)
 
@@ -218,9 +200,7 @@ class TestGhidraDecompiler(unittest.TestCase):
         EXE_PATH = "exe_file"
         OUTPUT_DIR = "output/directory/"
 
-        decompiler = TestUtils.get_mock_decompiler(
-            self.GHIDRA_DIR, self.GHIDRA_SCRIPT, True
-        )
+        decompiler = TestUtils.get_mock_decompiler(self.GHIDRA_DIR, True)
         with self.assertRaises(m_decompiler.InvalidDecompilationTarget):
             decompiler.decompile_exe_file(EXE_PATH, OUTPUT_DIR)
 

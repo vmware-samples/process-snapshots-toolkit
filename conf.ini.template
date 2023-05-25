@@ -1,3 +1,2 @@
 [ghidra]
-path=
-decompiler_script_path=
+ghidra_dir=

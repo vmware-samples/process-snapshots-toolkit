@@ -47,5 +47,11 @@ setuptools.setup(
         "nose-timer",
         "tox",
     ],
+    package_data={
+        "process_snapshot_toolkit.ghidra": [
+            "headless_scripts/*",
+            "scripts/*",
+        ]
+    }
 )
 
