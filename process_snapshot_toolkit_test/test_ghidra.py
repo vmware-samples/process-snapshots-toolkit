@@ -144,7 +144,7 @@ class TestGhidraDecompiler(unittest.TestCase):
     @mock.patch("{}.os.path.isdir".format(MODULE), clear=True)
     @mock.patch("{}.tempfile.mkdtemp".format(MODULE), clear=True)
     @mock.patch("{}.subprocess.Popen".format(MODULE), clear=True)
-    @mock.patch("{}.subprocess.Popen.communicate".format(MODULE), clear=True)
+    @mock.patch("{}.subprocess.check_call".format(MODULE), clear=True)
     @mock.patch("{}.shutil.rmtree".format(MODULE), clear=True)
     def test_ghidra_decompile_snapshot_file(
         self,
@@ -152,7 +152,7 @@ class TestGhidraDecompiler(unittest.TestCase):
         mock_isdir,
         mock_tempfile,
         mock_popen,
-        mock_popen_communicate,
+        mock_check_call,
         mock_rmtree,
     ):
         EXE_PATH = "exe_file"
@@ -168,7 +168,7 @@ class TestGhidraDecompiler(unittest.TestCase):
     @mock.patch("{}.os.path.isdir".format(MODULE), clear=True)
     @mock.patch("{}.tempfile.mkdtemp".format(MODULE), clear=True)
     @mock.patch("{}.subprocess.Popen".format(MODULE), clear=True)
-    @mock.patch("{}.subprocess.Popen.communicate".format(MODULE), clear=True)
+    @mock.patch("{}.subprocess.check_call".format(MODULE), clear=True)
     @mock.patch("{}.shutil.rmtree".format(MODULE), clear=True)
     def test_ghidra_decompile_exe_file(
         self,
@@ -176,7 +176,7 @@ class TestGhidraDecompiler(unittest.TestCase):
         mock_isdir,
         mock_tempfile,
         mock_popen,
-        mock_popen_communicate,
+        mock_check_call,
         mock_rmtree,
     ):
         EXE_PATH = "exe_file"
@@ -189,10 +189,10 @@ class TestGhidraDecompiler(unittest.TestCase):
 
     @mock.patch("{}.tempfile.mkdtemp".format(MODULE), clear=True)
     @mock.patch("{}.subprocess.Popen".format(MODULE), clear=True)
-    @mock.patch("{}.subprocess.Popen.communicate".format(MODULE), clear=True)
+    @mock.patch("{}.subprocess.check_call".format(MODULE), clear=True)
     @mock.patch("{}.shutil.rmtree".format(MODULE), clear=True)
     def test_ghidra_fail_decompile_snapshot_file(
-        self, mock_tempfile, mock_popen, mock_popen_communicate, mock_rmtree
+        self, mock_tempfile, mock_popen, mock_check_call, mock_rmtree
     ):
         EXE_PATH = "exe_file"
         SNAPSHOT_PATH = "process_snapshot"
@@ -210,10 +210,10 @@ class TestGhidraDecompiler(unittest.TestCase):
 
     @mock.patch("{}.tempfile.mkdtemp".format(MODULE), clear=True)
     @mock.patch("{}.subprocess.Popen".format(MODULE), clear=True)
-    @mock.patch("{}.subprocess.Popen.communicate".format(MODULE), clear=True)
+    @mock.patch("{}.subprocess.check_call".format(MODULE), clear=True)
     @mock.patch("{}.shutil.rmtree".format(MODULE), clear=True)
     def test_ghidra_fail_decompile_exe_file(
-        self, mock_tempfile, mock_popen, mock_popen_communicate, mock_rmtree
+        self, mock_tempfile, mock_popen, mock_check_call, mock_rmtree
     ):
         EXE_PATH = "exe_file"
         OUTPUT_DIR = "output/directory/"

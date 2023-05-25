@@ -138,11 +138,12 @@ class GhidraDecompiler(object):
                 snapshot_file_path,
             ]
 
-            stdout = stderr = subprocess.PIPE
-            if self._verbose:
-                stdout = stderr = None
-            process = subprocess.Popen(ghidra_cmd, stdout=stdout, stderr=stderr)
-            process.communicate()
+            with open(os.devnull, "w") as f:
+                kwargs = {}
+                if not self._verbose:
+                    kwargs['stdout'] = f
+                    kwargs['stderr'] = f
+                subprocess.check_call(ghidra_cmd, **kwargs)
 
         finally:
             shutil.rmtree(ghidra_work_dir)
@@ -179,10 +180,11 @@ class GhidraDecompiler(object):
                 output_dir,
             ]
 
-            stdout = stderr = subprocess.PIPE
-            if self._verbose:
-                stdout = stderr = None
-            process = subprocess.Popen(ghidra_cmd, stdout=stdout, stderr=stderr)
-            process.communicate()
+            with open(os.devnull, "w") as f:
+                kwargs = {}
+                if not self._verbose:
+                    kwargs['stdout'] = f
+                    kwargs['stderr'] = f
+                subprocess.check_call(ghidra_cmd, **kwargs)
         finally:
             shutil.rmtree(ghidra_work_dir)
