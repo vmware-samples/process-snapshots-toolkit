@@ -11,40 +11,80 @@ It is designed to provide a in-depth visibility into malicious code, including c
 
 For more details how to download Process Snapshot, please refer to the official [documentation](https://analysis.lastline.com/analysis/api-docs/html/analysis_results/format_ll_int_win.html#windows-analysis-process-dumps-pe-snapshots)
 
-#### Installation
+## Installation
 To install our package, please run 
 ```buildoutcfg
-pip install process_snapshot_toolkit
+pip2 install process_snapshot_toolkit
 ```
 
-## Ghidra postprocessing script
+Alternatively, this project can be installed via pip directly from a git clone of this repository
+```
+git clone <repo-url>
+cd process-snapshot-toolkit
+pip2 install .
+```
+
+## Development
+If changes need to be made to this project, then it can be installed in a manor where it will be
+usable directly from a local git repo copy.
+```
+# Optionally, use a virtualenv to install dependencies into, so as to not mess with system-level or
+# user-level dependencies
+python2 -m virtualenv venv
+. venv/bin/activate
+
+# Install dependencies needed to run the project.
+pip2 install -e .
+
+# Run tests
+python2 setup.py test
+```
+
+## Analysis
+
+#### Prerequisites
+This section assumes that you've downloaded the latest Ghidra from https://ghidra-sre.org/,
+unpacked it to a chosen directory, and are able to run Ghidra.
+
+### Ghidra Code Browser
+Process snapshots can be loaded into a code browser session of an exe file that the snapshot was
+taken for.
 
 #### Configuration
-Download the latest Ghidra from https://ghidra-sre.org/ and unpack it to chosen directory.
+Inside of the Ghidra Code Browser session's Script Manager (see "Window" tab), click the
+"Manage Script Directories" button (looks like a bulletpoint list). Inside the "Bundle Manager"
+popup, click the "Display file chooser to add bundles list" button (looks like a green "+"). Then
+select the subdirectory `ghidra/scripts` from inside wherever the process snapshot toolkit has been
+installed. If you used `pip` to install process_snapshot_toolkit inside of ubuntu, then this
+directory will be available via
+`~/.local/lib/python2.7/site-packages/process_snapshot_toolkit/ghidra/scripts/`
+
+#### Running
+Once the directory containing the script has been added to the Code Browser's script directories,
+the script `process_snapshot_loader.py` will be listed inside of the Script Manager.
+Double-click this script and follow the dialog to load a snapshot file.
+
+### Ghidra Headless
+Exe files and their corresponding process snapshots can be analyzed by Ghidra in a headless fashion
+to extract decompiled code, PCODE, and function call relationships between functions.
+
+#### Configuration
 
 Using conf.ini.template create a configuration file
 ```
 [ghidra]
-path=<path to location with Ghidra decompiler location>
-decompiler_script_path=<path to postprocessing script from this toolkit>
+ghidra_dir=<path to location where Ghidra was unpacked>
 ```
 
-Postprocessing script is located here:
-```
-process-snapshot-toolkit/ghidra_scripts/postprocess.py
-```
-
-#### Analysis
-The script is using Ghidra in the headless mode to decompile a binary and extract decompiled code as well as PCODE from an executable as well as Lastline Process Snapshot.
-
+#### Running
 To decompile using the original executable file only:
 ```
-python ghidra_analyze.py -c conf.ini -o <output_dir> --exe-file <original_executable>
+ghidra_analyze.py -c conf.ini -o <output_dir> --exe-file <original_executable>
 ```
 
 To decompile using the original executable file and the Lastline Process Snapshot:
 ```
-python ghidra_analyze.py -c conf.ini -o <output_dir> --exe-file <original_executable> --snapshot-file <lastline_process_snapshot>
+ghidra_analyze.py -c conf.ini -o <output_dir> --exe-file <original_executable> --snapshot-file <lastline_process_snapshot>
 ```
 
 #### Generated files
