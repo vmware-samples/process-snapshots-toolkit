@@ -29,11 +29,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # that is a super-hack to make Ghidra see our modules from post-processing script
-sys.path.append("/usr/local/lib/python2.7/dist-packages")
-sys.path.append("/usr/lib/python2.7/dist-packages")
-sys.path.append(
-    "{}/.local/lib/python2.7/site-packages/".format(os.path.expanduser("~"))
-)
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from process_snapshot_toolkit.snapshot import factory
 from process_snapshot_toolkit.snapshot import utils
@@ -60,14 +56,15 @@ class Error(Exception):
 
 try:
     # global Ghidra objects provided by Ghidra
+    from __main__ import *  # This ensures Ghidra globals like `currentProgram` are available
     functionManager = currentProgram.getFunctionManager()
     externalManager = currentProgram.getExternalManager()
     listing = currentProgram.getListing()
     memory = currentProgram.getMemory()
 except NameError as err:
     logger.error(
-        "Ghidra postprocessing script cannot be run stand alone and needs to be run "
-        "as part of Ghidra headless analysis. Error: %s",
+        "Ghidra postprocessing module cannot be loaded stand alone and needs to be loaded "
+        "as part of a script in Ghidra analysis. Error: %s",
         err,
     )
 
@@ -567,86 +564,3 @@ def extract_pcode_functions(decomp, output_filepath, snapshot=None):
         logger.error(
             "Failed to extraced called functions to %s. Error: %s", output_filepath, err
         )
-
-
-def do_postprocess(args):
-    parser = argparse.ArgumentParser(
-        usage="""
-================================================================================
-"""
-        + __doc__.strip()
-        + """
-================================================================================
-
-Postprocess script for Ghidra Decompiler
-
-"""
-    )
-    parser.add_argument(
-        "output_dir", default=None, help="Output directory to store results"
-    )
-    parser.add_argument(
-        "snapshot_file",
-        default=None,
-        nargs="?",
-        help="Lastline snapshot file to decompile and extract data from",
-    )
-
-    args = parser.parse_args(args)
-
-    executable_name = os.path.basename(currentProgram.getExecutablePath())
-    logger.info("Processing file: %s", executable_name)
-    if args.snapshot_file:
-        logger.info("Snapshot file: %s", args.snapshot_file)
-    logger.info("Output directory: %s", args.output_dir)
-
-    decompiled_functions = set()
-    decomp = m_decompiler.DecompInterface()
-    decomp.openProgram(currentProgram)
-    # m_decompiler.DecompInterface.setSimplificationStyle("normalize")
-    options = m_decompiler.DecompileOptions()
-    options.grabFromProgram(currentProgram)
-    decomp.setOptions(options)
-
-    source_path = os.path.join(args.output_dir, "{}.c".format(executable_name))
-    extract_decompiled_functions(decomp, source_path)
-
-    extract_called_functions(
-        os.path.join(args.output_dir, "{}.called".format(executable_name))
-    )
-    extract_pcode_functions(
-        decomp, os.path.join(args.output_dir, "{}.pcode".format(executable_name))
-    )
-
-    if args.snapshot_file:
-        snapshot_manager = factory.ProcessSnapshotMgrFactory.from_file(
-            args.snapshot_file
-        )
-        for (snapshot_id, bitsize), snapshot in snapshot_manager.snapshots.items():
-            logger.info("Processing snapshot id: %d bitsize: %d", snapshot_id, bitsize)
-            if not load_snapshot(decomp, snapshot):
-                continue
-            dst_name = "{}_{}_{}".format(
-                os.path.basename(args.snapshot_file), snapshot_id, bitsize
-            )
-            source_path = os.path.join(args.output_dir, "{}.c".format(dst_name))
-            extract_decompiled_functions(decomp, source_path, snapshot)
-            extract_called_functions(
-                os.path.join(args.output_dir, "{}.called".format(dst_name)), snapshot
-            )
-            extract_pcode_functions(
-                decomp,
-                os.path.join(args.output_dir, "{}.pcode".format(dst_name)),
-                snapshot,
-            )
-
-
-try:
-    args = getScriptArgs()
-    do_postprocess(getScriptArgs())
-except NameError as err:
-    logger.error(
-        "Ghidra postprocessing script cannot be run stand alone and needs to be run "
-        "as part of Ghidra headless analysis. Error: %s",
-        err,
-    )

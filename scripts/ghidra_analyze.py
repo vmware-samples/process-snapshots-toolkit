@@ -127,12 +127,6 @@ Analyze executable file or Lastline Process Snapshot using Ghidra decompiler.
         help="Directory with Ghidra repo",
     )
     parser.add_argument(
-        "--decompiler-script-path",
-        dest="decompiler_script_path",
-        default=None,
-        help="Path to Ghidra postprocessing script",
-    )
-    parser.add_argument(
         "-v",
         "--verbose",
         dest="verbose",

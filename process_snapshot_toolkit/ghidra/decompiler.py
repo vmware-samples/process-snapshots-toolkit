@@ -43,7 +43,7 @@ class InvalidDecompilationTarget(Error):
 class GhidraDecompiler(object):
     """Interface to Ghidra to decompile exe files and Lastline process snapshots."""
 
-    def __init__(self, ghidra_dir, postprocessing_script_path, verbose=False):
+    def __init__(self, ghidra_dir, verbose=False):
         """
         Interface to launch Ghidra decompiler.
 
@@ -51,7 +51,9 @@ class GhidraDecompiler(object):
         :param str postprocessing_script_path: path to Ghidra postprocessing script
         """
         self._ghidra_dir = ghidra_dir
-        self._postprocessing_script_path = postprocessing_script_path
+        self._postprocessing_script_path = os.path.join(
+            os.path.dirname(__file__), "headless_scripts", "postprocess.py"
+        )
         self._verbose = verbose
 
     @classmethod
@@ -79,20 +81,7 @@ class GhidraDecompiler(object):
                 "Unable to find Ghidra directory: {}".format(ghidra_dir)
             )
 
-        decompiler_script_path = None
-        if args and args.decompiler_script_path:
-            decompiler_script_path = args.decompiler_script_path
-        elif conf and conf.has_option("ghidra", "decompiler_script_path"):
-            decompiler_script_path = conf.get("ghidra", "decompiler_script_path")
-
-        if not decompiler_script_path or not os.path.isfile(decompiler_script_path):
-            raise InvalidGhidraSettings(
-                "Unable to find Ghidra postporcessing script: {}".format(
-                    decompiler_script_path
-                )
-            )
-
-        return cls(ghidra_dir, decompiler_script_path, args.verbose)
+        return cls(ghidra_dir, args.verbose)
 
     def decompile_snapshot_file(self, exe_file_path, snapshot_file_path, output_dir):
         """
@@ -138,11 +127,12 @@ class GhidraDecompiler(object):
                 snapshot_file_path,
             ]
 
-            stdout = stderr = subprocess.PIPE
-            if self._verbose:
-                stdout = stderr = None
-            process = subprocess.Popen(ghidra_cmd, stdout=stdout, stderr=stderr)
-            process.communicate()
+            with open(os.devnull, "w") as f:
+                kwargs = {}
+                if not self._verbose:
+                    kwargs['stdout'] = f
+                    kwargs['stderr'] = f
+                subprocess.check_call(ghidra_cmd, **kwargs)
 
         finally:
             shutil.rmtree(ghidra_work_dir)
@@ -179,10 +169,11 @@ class GhidraDecompiler(object):
                 output_dir,
             ]
 
-            stdout = stderr = subprocess.PIPE
-            if self._verbose:
-                stdout = stderr = None
-            process = subprocess.Popen(ghidra_cmd, stdout=stdout, stderr=stderr)
-            process.communicate()
+            with open(os.devnull, "w") as f:
+                kwargs = {}
+                if not self._verbose:
+                    kwargs['stdout'] = f
+                    kwargs['stderr'] = f
+                subprocess.check_call(ghidra_cmd, **kwargs)
         finally:
             shutil.rmtree(ghidra_work_dir)
