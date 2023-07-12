@@ -619,8 +619,11 @@ Postprocess script for Ghidra Decompiler
     )
 
     if args.snapshot_file:
+        # snapshot_manager = factory.ProcessSnapshotMgrFactory.from_file(
+        #     args.snapshot_file
+        # )
         snapshot_manager = factory.ProcessSnapshotMgrFactory.from_file(
-            args.snapshot_file
+            executable_name + '.snapshot2'
         )
         for (snapshot_id, bitsize), snapshot in snapshot_manager.snapshots.items():
             logger.info("Processing snapshot id: %d bitsize: %d", snapshot_id, bitsize)
@@ -640,10 +643,32 @@ Postprocess script for Ghidra Decompiler
                 snapshot,
             )
 
+def do_postprocess_in_ghidra():
+    # executable_name = os.path.basename(currentProgram.getExecutablePath())
+    executable_name = currentProgram.getExecutablePath()
+    logger.info("Processing file: %s", executable_name)
+
+    decompiled_functions = set()
+    decomp = m_decompiler.DecompInterface()
+    decomp.openProgram(currentProgram)
+    # m_decompiler.DecompInterface.setSimplificationStyle("normalize")
+    options = m_decompiler.DecompileOptions()
+    options.grabFromProgram(currentProgram)
+    decomp.setOptions(options)
+
+    snapshot_manager = factory.ProcessSnapshotMgrFactory.from_file(
+        executable_name + '.snapshot2'
+    )
+    # TODO: instead of selecting first and break, using some sorta GUI select for specific index
+    for (snapshot_id, bitsize), snapshot in snapshot_manager.snapshots.items():
+        logger.info("Processing snapshot id: %d bitsize: %d", snapshot_id, bitsize)
+        if not load_snapshot(decomp, snapshot):
+            continue
+        break
+
 
 try:
-    args = getScriptArgs()
-    do_postprocess(getScriptArgs())
+    do_postprocess_in_ghidra()
 except NameError as err:
     logger.error(
         "Ghidra postprocessing script cannot be run stand alone and needs to be run "
